@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Browser Extension",
+  "version": "1.0.0",
+  "description": "Une extension de navigateur avec React et Tailwind",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "vite.svg",
+      "48": "vite.svg",
+      "128": "vite.svg"
+    }
+  },
+  "permissions": ["tabs"],
+  "icons": {
+    "16": "vite.svg",
+    "48": "vite.svg",
+    "128": "vite.svg"
+  }
+} 
