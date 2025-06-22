@@ -11,10 +11,13 @@
       "128": "vite.svg"
     }
   },
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
   "icons": {
     "16": "vite.svg",
     "48": "vite.svg",
     "128": "vite.svg"
+  },
+  "background": {
+    "service_worker": "background.js"
   }
 } 

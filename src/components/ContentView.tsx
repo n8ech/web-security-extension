@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import SetPassword from './SetPassword';
 
 interface ContentViewProps {
   activeView: string;
@@ -55,13 +56,12 @@ const ContentView: React.FC<ContentViewProps> = ({ activeView }) => {
         }
       };
 
-      if (chrome && chrome.tabs) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const currentUrl = tabs[0]?.url;
+      if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ type: 'GET_ACTIVE_TAB_URL' }, (response) => {
+          const currentUrl = response?.url;
           if (currentUrl) {
             fetchScore(currentUrl);
           } else {
-            // Can't get URL, use fallback
             setSecurityScore(25);
             setLoading(false);
           }
@@ -172,6 +172,8 @@ const ContentView: React.FC<ContentViewProps> = ({ activeView }) => {
             </p>
           </div>
         );
+      case 'set-password':
+        return <SetPassword />;
       default:
         return <div>Sélectionnez une vue dans le menu</div>;
     }
