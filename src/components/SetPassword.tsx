@@ -53,6 +53,13 @@ const SetPassword: React.FC<SetPasswordProps> = ({ onPasswordSet }) => {
       setError(err.message || 'Erreur lors du changement de mot de passe');
     } finally {
       setLoading(false);
+      // Suppression du token 'set-password' du storage
+      const chromeObj = typeof window !== 'undefined' ? (window as any).chrome : undefined;
+      if (chromeObj && chromeObj.storage && chromeObj.storage.local) {
+        chromeObj.storage.local.remove(['set-password']);
+      } else {
+        localStorage.removeItem('set-password');
+      }
     }
   };
 

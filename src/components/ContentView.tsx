@@ -23,11 +23,11 @@ const ContentView: React.FC<ContentViewProps> = ({ activeView }) => {
           // Retrieve token from storage
           const token = await new Promise<string | null>((resolve) => {
             if (chrome && chrome.storage && chrome.storage.local) {
-              chrome.storage.local.get(['token'], (result) => {
-                resolve(result.token || null);
+              chrome.storage.local.get(['token', 'guest-token'], (result) => {
+                resolve(result.token || result['guest-token'] || null);
               });
             } else {
-              resolve(localStorage.getItem('token'));
+              resolve(localStorage.getItem('token') || localStorage.getItem('guest-token'));
             }
           });
 
@@ -115,14 +115,14 @@ const ContentView: React.FC<ContentViewProps> = ({ activeView }) => {
             </p>
           </div>
         );
-      case 'list':
+      case 'download':
         return (
           <div>
-            <h1 className="text-2xl font-bold mb-4">Liste</h1>
+            <h1 className="text-2xl font-bold mb-4">Téléchargement</h1>
             <ul className="space-y-2">
               {[1, 2, 3, 4, 5].map((item) => (
                 <li key={item} className="p-3 bg-gray-100 rounded-lg">
-                  Élément {item}
+                  Fichier téléchargé {item}
                 </li>
               ))}
             </ul>
@@ -167,13 +167,45 @@ const ContentView: React.FC<ContentViewProps> = ({ activeView }) => {
         return (
           <div>
             <h1 className="text-2xl font-bold mb-4">Paramètres</h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               Il n'y a pas encore de paramètres disponibles.
             </p>
+            <div className="flex flex-col items-start gap-4">
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                onClick={() => {
+                  if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                    if (chrome && chrome.storage && chrome.storage.local) {
+                      chrome.storage.local.remove(['token'], () => {
+                        window.location.reload();
+                      });
+                    } else {
+                      localStorage.removeItem('token');
+                      window.location.reload();
+                    }
+                  }
+                }}
+              >
+                Se déconnecter
+              </button>
+              <button
+                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                onClick={() => alert('Fonctionnalité premium à venir !')}
+              >
+                Passer premium
+              </button>
+            </div>
           </div>
         );
       case 'set-password':
         return <SetPassword />;
+      case 'password':
+        return (
+          <div>
+            <h1 className="text-2xl font-bold mb-4">Mot de passe</h1>
+            <p className="text-gray-600">En cours de développement...</p>
+          </div>
+        );
       default:
         return <div>Sélectionnez une vue dans le menu</div>;
     }

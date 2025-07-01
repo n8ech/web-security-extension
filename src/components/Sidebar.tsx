@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiHome, FiSettings, FiShield, FiList } from 'react-icons/fi';
+import { FiHome, FiSettings, FiShield, FiList, FiLock } from 'react-icons/fi';
 
 interface SidebarProps {
   activeView: string;
@@ -9,7 +9,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
   const menuItems = [
     { id: 'home', icon: <FiHome size={24} />, title: 'Accueil' },
-    { id: 'list', icon: <FiList size={24} />, title: 'Liste' },
+    { id: 'password', icon: <FiLock size={24} />, title: 'Mot de passe (en cours de développement)' },
     { id: 'security', icon: <FiShield size={24} />, title: 'Sécurité' },
     { id: 'settings', icon: <FiSettings size={24} />, title: 'Paramètres' },
   ];

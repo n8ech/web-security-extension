@@ -15,17 +15,17 @@ function App() {
     const checkTokenAndSetPassword = async () => {
       const chromeObj = typeof window !== 'undefined' ? (window as any).chrome : undefined;
       if (chromeObj && chromeObj.storage && chromeObj.storage.local) {
-        chromeObj.storage.local.get(['token', 'set-password'], (result: any) => {
+        chromeObj.storage.local.get(['token', 'guest-token', 'set-password'], (result: any) => {
           if (result && result['set-password']) {
             setForceSetPasswordView(true);
-          } else if (result && result.token) {
+          } else if (result && (result.token || result['guest-token'])) {
             setIsAuthenticated(true)
           }
           setLoading(false)
         })
       } else {
         // Fallback localStorage
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token') || localStorage.getItem('guest-token')
         const setPassword = localStorage.getItem('set-password')
         if (setPassword) {
           setForceSetPasswordView(true)

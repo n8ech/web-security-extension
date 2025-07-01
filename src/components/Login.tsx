@@ -54,6 +54,62 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     }
   };
 
+  // Fonction utilitaire pour collecter des infos discriminantes
+  const collectGuestInfo = () => {
+    return {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      languages: navigator.languages,
+      platform: navigator.platform,
+      vendor: navigator.vendor,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      deviceMemory: (navigator as any).deviceMemory,
+      screen: {
+        width: window.screen.width,
+        height: window.screen.height,
+        colorDepth: window.screen.colorDepth,
+      },
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
+  };
+
+  // Gestion du bouton invité
+  const handleGuest = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const guestInfo = collectGuestInfo();
+      const response = await fetch('https://adapting-sloth-tightly.ngrok-free.app/auth/guest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(guestInfo),
+      });
+      if (!response.ok) {
+        throw new Error('Erreur lors de la connexion invitée');
+      }
+      const data = await response.json();
+      if (data.token) {
+        const chromeObj = typeof window !== 'undefined' ? (window as any).chrome : undefined;
+        if (chromeObj && chromeObj.storage && chromeObj.storage.local) {
+          chromeObj.storage.local.set({ 'guest-token': data.token }, () => {
+            onLoginSuccess();
+          });
+        } else {
+          localStorage.setItem('guest-token', data.token);
+          onLoginSuccess();
+        }
+      } else {
+        throw new Error('Token non reçu');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erreur lors de la connexion invitée');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center w-full h-full bg-white p-6">
       <form onSubmit={handleSubmit} className="w-full max-w-xs">
@@ -79,13 +135,23 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           />
         </div>
         {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          disabled={loading}
-        >
-          {loading ? 'Connexion...' : 'Se connecter'}
-        </button>
+        <div className="flex flex-row gap-2">
+          <button
+            type="submit"
+            className="w-1/2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
+          >
+            {loading ? 'Connexion...' : 'Se connecter'}
+          </button>
+          <button
+            type="button"
+            className="w-1/2 bg-gray-300 text-gray-800 py-2 rounded hover:bg-gray-400 transition"
+            onClick={handleGuest}
+            disabled={loading}
+          >
+            Continuer sans compte
+          </button>
+        </div>
       </form>
     </div>
   );
